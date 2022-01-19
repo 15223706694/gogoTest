@@ -1,18 +1,14 @@
 --- 
- kind: pipeline 
- type: docker 
- name: linux-amd64 
-   platform: 
+kind: pipeline 
+type: docker 
+name: linux-amd64 
+ 
+platform: 
  arch: amd64 
  os: linux 
-   steps: 
- - name: test 
- image: golang:1.14.15 
- commands: 
- - go test ./... 
- - go build -o /dev/null github.com/drone/drone/cmd/drone-server 
- - go build -o /dev/null -tags "oss nolimit" github.com/drone/drone/cmd/drone-server
- - name: test
-  image: maven:3.6.2-jdk-8
-  commands:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true 
+ 
+steps: 
+- name: test 
+  image: maven
+  commands: 
+   - mvn clean install
