@@ -1,30 +1,56 @@
-kind: pipeline
-type: docker
-name: default
+name: Build & Deploy
+on: [push]
+jobs:
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        steps:
 
-steps:
-- name: test
-  image: maven:3.6.2-jdk-8
-  commands:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true
-- name: build
-  image: golang
-  commands:
-    - go build
-    - go test
-    - name: docker  
-  image: plugins/docker
-  settings:
-    repo: 15223706694/gogoTest
-    auto_tag: true
-    auto_tag_suffix: linux-amd64
-    username: 15223706694
-    password: flx231224..
-    tags:
-    - 1.0.0
-    - 1.0
-- name: notify
-  image: plugins/slack
-  settings:
-    channel: developers
-    username: drone
+    - name: Set up Go 1.12
+        uses: actions/setup-go@v1
+        with:
+            go-version: 1.12
+        id: go
+
+        - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+        - name: Get dependencies
+        run: |
+            go get -v -t -d ./...
+            if [ -f Gopkg.toml ]; then
+                curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+                dep ensure
+            fi
+        - name: Build
+        run: |
+            go build -v .
+            pwd
+
+        - name: Archive production artifacts
+        uses: actions/upload-artifact@v1
+        with:
+            name: drone_test
+            path: /home/runner/work/drone_test/drone_test
+
+    dockerfile:
+        name: Build Image
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+
+        - name: Get artifacts
+        uses: actions/download-artifact@master
+        with:
+            name: drone_test
+            path: /home/runner/work/drone_test/gogoTest
+
+        - name: Build & Publish to Registry
+        uses: wuhan005/publish-docker-action@master
+        with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+            registry: 192.168.61.95:8080
+            repository: 192.168.61.95:8080/15223706694/gogoTest
+            tag_format: "%YYYY%_%MM%_%DD%_%H%%m%%s%"
+            auto_tag: true
