@@ -20,6 +20,9 @@ steps:
     auto_tag_suffix: linux-amd64
     username: root
     password: root
+    tags:
+    - 1.0.0
+    - 1.0
 - name: notify
   image: plugins/slack
   settings:
