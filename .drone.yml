@@ -15,7 +15,7 @@ steps:
     - name: docker  
   image: plugins/docker
   settings:
-    repo: foo/bar
+    repo: 15223706694/gogoTest
     auto_tag: true
     auto_tag_suffix: linux-amd64
     username: root
