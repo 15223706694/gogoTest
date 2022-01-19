@@ -1,56 +1,18 @@
-name: Build & Deploy
-on: [push]
-jobs:
-    build:
-        name: Build
-        runs-on: ubuntu-latest
-        steps:
+kind: pipeline
+name: default
 
-    - name: Set up Go 1.12
-        uses: actions/setup-go@v1
-        with:
-            go-version: 1.12
-        id: go
+workspace:
+  base: /go
+#  path: src/github.com/cuisongliu/githubio
 
-        - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
-
-        - name: Get dependencies
-        run: |
-            go get -v -t -d ./...
-            if [ -f Gopkg.toml ]; then
-                curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-                dep ensure
-            fi
-        - name: Build
-        run: |
-            go build -v .
-            pwd
-
-        - name: Archive production artifacts
-        uses: actions/upload-artifact@v1
-        with:
-            name: drone_test
-            path: /home/runner/work/drone_test/drone_test
-
-    dockerfile:
-        name: Build Image
-        runs-on: ubuntu-latest
-        needs: build
-        steps:
-
-        - name: Get artifacts
-        uses: actions/download-artifact@master
-        with:
-            name: drone_test
-            path: /home/runner/work/drone_test/gogoTest
-
-        - name: Build & Publish to Registry
-        uses: wuhan005/publish-docker-action@master
-        with:
-            username: ${{ secrets.DOCKER_USERNAME }}
-            password: ${{ secrets.DOCKER_PASSWORD }}
-            registry: 192.168.61.95:8080
-            repository: 192.168.61.95:8080/15223706694/gogoTest
-            tag_format: "%YYYY%_%MM%_%DD%_%H%%m%%s%"
-            auto_tag: true
+steps:
+  - name: submodules
+    image: docker:git
+    commands:
+      - git clone --recursive https://github.com/15223706694/gogoTest.git
+  - name: build-hugo
+    image: golang:1.13
+    settings:
+      username:  15223706694
+      password:  flx231224..
+      
