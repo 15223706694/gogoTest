@@ -7,3 +7,21 @@ steps:
   image: maven:3.6.2-jdk-8
   commands:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true
+- name: build
+  image: golang
+  commands:
+    - go build
+    - go test
+    - name: docker  
+  image: plugins/docker
+  settings:
+    repo: foo/bar
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
+    username: root
+    password: root
+- name: notify
+  image: plugins/slack
+  settings:
+    channel: developers
+    username: drone
