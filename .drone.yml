@@ -18,8 +18,8 @@ steps:
     repo: 15223706694/gogoTest
     auto_tag: true
     auto_tag_suffix: linux-amd64
-    username: root
-    password: root
+    username: 15223706694
+    password: flx231224..
     tags:
     - 1.0.0
     - 1.0
