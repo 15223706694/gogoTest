@@ -3,25 +3,7 @@ type: docker
 name: default
 
 steps:
-- name: build
-  image: golang
+- name: test
+  image: maven:3.6.2-jdk-8
   commands:
-  - go get
-  - go test
-  - go build
-
-- name: publish
-  image: plugins/docker
-  settings:
-    username: 15223706694
-    password: flx231224..
-    repo: 15223706694/gogoTest
-    tags:
-    - 1.0.0
-    - 1.0
-
-- name: notify
-  image: plugins/slack
-  settings:
-    channel: developers
-    username: drone
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true
