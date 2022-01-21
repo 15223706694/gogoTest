@@ -1,14 +1,9 @@
---- 
-kind: pipeline 
-type: docker 
-name: linux-amd64 
- 
-platform: 
- arch: amd64 
- os: linux 
- 
-steps: 
-- name: test 
-  image: maven
-  commands: 
-   - mvn clean install
+kind: pipeline
+name: default
+
+steps:
+- name: test
+  image: maven:3-jdk-10
+  commands:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn test -B
